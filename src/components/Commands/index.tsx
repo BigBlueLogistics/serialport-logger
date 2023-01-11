@@ -1,4 +1,5 @@
 import { ICommands } from "./types";
+import "./styles.scss";
 
 function Commands({
   data,

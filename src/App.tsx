@@ -3,6 +3,7 @@ import Connection from "./components/Connection";
 import Commands from "./components/Commands";
 import { ITriggerStatus } from "./components/Commands/types";
 import { SerialPort, ReadlineParser } from "serialport";
+import "./App.scss";
 
 let initConfigPort: SerialPort;
 
@@ -92,7 +93,7 @@ function App() {
   }, [initConfigPort]);
 
   return (
-    <div>
+    <div className="container">
       <Connection
         isConnected={isConnected}
         initConfig={initConfig}

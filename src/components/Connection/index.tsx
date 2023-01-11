@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { SerialPort } from "serialport";
 import { IPorts, IConnection } from "./types";
-import "./styles.css";
 
 function Connection({
   isConnected,
@@ -26,7 +25,6 @@ function Connection({
   }, []);
 
   return (
-    <div>
       <fieldset>
         <legend>Communication</legend>
         <button type="button" onClick={initConfig}>
@@ -43,7 +41,6 @@ function Connection({
             : null}
         </select>
       </fieldset>
-    </div>
   );
 }
 
