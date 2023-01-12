@@ -1,4 +1,3 @@
-import "./styles.scss";
 import { IDataHistory } from "./types";
 
 function DataHistory({ data }: IDataHistory) {

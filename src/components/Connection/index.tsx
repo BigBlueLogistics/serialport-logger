@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { SerialPort } from "serialport";
 import { IPorts, IConnection } from "./types";
+import "./styles.scss";
 
 function Connection({
   isConnected,
@@ -25,22 +26,22 @@ function Connection({
   }, []);
 
   return (
-      <fieldset>
-        <legend>Communication</legend>
-        <button type="button" onClick={initConfig}>
-          Connect
-        </button>
-        <select onChange={onChangePortConfig}>
-          <option value="">---</option>
-          {optionPorts.length
-            ? optionPorts.map((data) => (
-                <option key={data.path} value={data.path}>
-                  {data.path}
-                </option>
-              ))
-            : null}
-        </select>
-      </fieldset>
+    <fieldset id="fldt-connection">
+      <legend>Communication</legend>
+      <button type="button" onClick={initConfig}>
+        Connect
+      </button>
+      <select onChange={onChangePortConfig}>
+        <option value="">---</option>
+        {optionPorts.length
+          ? optionPorts.map((data) => (
+              <option key={data.path} value={data.path}>
+                {data.path}
+              </option>
+            ))
+          : null}
+      </select>
+    </fieldset>
   );
 }
 

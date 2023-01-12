@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import Connection from "./components/Connection";
-import Commands from "./components/Commands";
-import { ITriggerStatus } from "./components/Commands/types";
+import Command from "./components/Command";
+import { ITriggerStatus } from "./components/Command/types";
 import { SerialPort, ReadlineParser } from "serialport";
 import { arrayLimit } from "./utils";
 import "./App.scss";
@@ -107,7 +107,7 @@ function App() {
         initConfig={initConfig}
         onChangePortConfig={onChangePortConfig}
       />
-      <Commands
+      <Command
         isConnected={isConnected}
         data={historyData}
         triggerStatus={triggerStatus}

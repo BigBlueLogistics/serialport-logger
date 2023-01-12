@@ -1,0 +1,8 @@
+#fldt-connection {
+  display: flex;
+  column-gap: 5px;
+
+  & > * {
+    flex-basis: 50%;
+  }
+}
