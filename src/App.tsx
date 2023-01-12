@@ -14,31 +14,57 @@ function App() {
   const [triggerStatus, setTriggerStatus] = useState<ITriggerStatus>("LOFF");
   const [historyData, setHistoryData] = useState<string[]>([]);
 
-  const initConfig = () => {
+  const initConnection = () => {
+    return new SerialPort({
+      path: selectedPort,
+      baudRate: 9600,
+      dataBits: 8,
+      parity: "none",
+      stopBits: 1,
+      autoOpen: false,
+      endOnClose: true,
+    });
+  };
+
+  const onToggleConnection = () => {
     try {
-      initConfigPort = new SerialPort({
-        path: selectedPort,
-        baudRate: 9600,
-        dataBits: 8,
-        parity: "none",
-        stopBits: 1,
-        autoOpen: false,
-        endOnClose: true,
-      });
-
-      // Open the port
-      initConfigPort.open((err) => {
-        if (err) {
-          console.log(`Error opening port: ${err.message}`);
-          return;
-        }
-
-        setIsConnected(true);
-      });
+      if (!isConnected) {
+        initConfigPort = initConnection();
+        openPort();
+      } else {
+        closePort();
+      }
     } catch (error) {
       console.log(error);
       return error;
     }
+  };
+
+  const openPort = () => {
+    // Open the port
+    initConfigPort.open((err) => {
+      if (err) {
+        console.log(`Error opening port: ${err.message}`);
+        return;
+      }
+
+      setIsConnected(true);
+    });
+  };
+
+  const closePort = () => {
+    if (initConfigPort.isOpen) {
+      sendCommand("LOFF");
+    }
+    // Close the port
+    initConfigPort.close((err) => {
+      if (err) {
+        console.log(`Error closing port: ${err.message}`);
+        return;
+      }
+      setTriggerStatus("LOFF");
+      setIsConnected(false);
+    });
   };
 
   const sendCommand = (status: ITriggerStatus) => {
@@ -87,24 +113,15 @@ function App() {
     }
   };
 
-  const closeConnection = () => {
-    if (isConnected) {
-      sendCommand("LOFF");
-      initConfigPort.close();
-    }
-  };
-
   useEffect(() => {
     readData();
-
-    return () => closeConnection();
   }, [initConfigPort]);
 
   return (
     <div className="container">
       <Connection
         isConnected={isConnected}
-        initConfig={initConfig}
+        onToggleConnection={onToggleConnection}
         onChangePortConfig={onChangePortConfig}
       />
       <Command

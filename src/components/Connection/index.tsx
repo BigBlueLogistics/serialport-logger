@@ -5,7 +5,7 @@ import "./styles.scss";
 
 function Connection({
   isConnected,
-  initConfig,
+  onToggleConnection,
   onChangePortConfig,
 }: IConnection) {
   const [optionPorts, setOptionPorts] = useState<IPorts>([]);
@@ -28,10 +28,14 @@ function Connection({
   return (
     <fieldset id="fldt-connection">
       <legend>Communication</legend>
-      <button type="button" onClick={initConfig}>
-        Connect
+      <button
+        type="button"
+        onClick={onToggleConnection}
+        className="btn-connect"
+      >
+        {isConnected ? "disconnect" : "connect"}
       </button>
-      <select onChange={onChangePortConfig}>
+      <select onChange={onChangePortConfig} disabled={isConnected}>
         <option value="">---</option>
         {optionPorts.length
           ? optionPorts.map((data) => (

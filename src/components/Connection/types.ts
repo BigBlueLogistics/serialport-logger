@@ -3,7 +3,7 @@ import { SerialPort } from "serialport";
 
 export type IConnection = {
   isConnected: boolean;
-  initConfig: () => SerialPort | unknown;
+  onToggleConnection: () => SerialPort | unknown;
   onChangePortConfig: (e: ChangeEvent<HTMLSelectElement>) => void;
 };
 
