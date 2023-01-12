@@ -3,6 +3,7 @@ import Connection from "./components/Connection";
 import Commands from "./components/Commands";
 import { ITriggerStatus } from "./components/Commands/types";
 import { SerialPort, ReadlineParser } from "serialport";
+import { arrayLimit } from "./utils";
 import "./App.scss";
 
 let initConfigPort: SerialPort;
@@ -14,7 +15,6 @@ function App() {
   const [historyData, setHistoryData] = useState<string[]>([]);
 
   const initConfig = () => {
-    console.log("PORT", selectedPort);
     try {
       initConfigPort = new SerialPort({
         path: selectedPort,
@@ -68,14 +68,22 @@ function App() {
       const parser = new ReadlineParser();
       initConfigPort.pipe(parser);
       initConfigPort.setEncoding("utf8");
+
       initConfigPort.on("readable", function () {
         const plainText = initConfigPort.read();
-        if (plainText != "") {
-          setHistoryData((prev) => [...prev, plainText]);
+        if (plainText && plainText.match(/./i)) {
+          // Limit data to only 6 entries and
+          // display the last two elements from array.
+          setHistoryData((prev) => {
+            const newData = [...prev, plainText];
+            const limitData = arrayLimit(6, newData);
+
+            return limitData;
+          });
         }
       });
     } else {
-      console.log("no dataz", initConfigPort);
+      console.log("no data");
     }
   };
 

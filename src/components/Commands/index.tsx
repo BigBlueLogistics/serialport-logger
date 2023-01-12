@@ -1,3 +1,4 @@
+import DataHistory from "../DataHistory";
 import { ICommands } from "./types";
 import "./styles.scss";
 
@@ -20,15 +21,8 @@ function Commands({
         </button>
       </div>
       <legend>Command</legend>
-      <div className="data-history">
-        {data.length ? (
-          data.map((barcode, idx) => (
-            <p key={idx}>{barcode.split(":").toString()}</p>
-          ))
-        ) : (
-          <p>No data available.</p>
-        )}
-      </div>
+
+      <DataHistory data={data} />
     </fieldset>
   );
 }
