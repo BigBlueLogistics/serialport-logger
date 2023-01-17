@@ -1,3 +1,5 @@
 export type IDataHistory = {
-  data: string[];
+  palletNo: string;
+  status: "success" | "failed" | "idle";
+  message: string;
 };

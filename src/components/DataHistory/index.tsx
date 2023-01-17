@@ -1,12 +1,13 @@
 import { IDataHistory } from "./types";
 
-function DataHistory({ data }: IDataHistory) {
+function DataHistory({ palletNo, status, message }: IDataHistory) {
   return (
     <div className="data-history">
-      {data.length ? (
-        data.map((barcode, idx) => (
-          <p key={idx}>{barcode.split(":").toString()}</p>
-        ))
+      {palletNo ? (
+        <>
+          <h2>{palletNo}</h2>
+          <p>{message}</p>
+        </>
       ) : (
         <p>No data available.</p>
       )}

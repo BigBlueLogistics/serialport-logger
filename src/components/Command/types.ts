@@ -4,5 +4,4 @@ export type ICommands = {
   isConnected: boolean;
   triggerStatus: ITriggerStatus;
   onTriggerStatus: () => void;
-  data: string[];
 };

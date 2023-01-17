@@ -1,9 +1,11 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import Connection from "./components/Connection";
 import Command from "./components/Command";
+import DataHistory from "./components/DataHistory";
+import { IDataHistory } from "./components/DataHistory/types";
 import { ITriggerStatus } from "./components/Command/types";
 import { SerialPort, ReadlineParser } from "serialport";
-import { arrayLimit } from "./utils";
+import { format } from "./utils";
 import "./App.scss";
 
 let initConfigPort: SerialPort;
@@ -12,7 +14,9 @@ function App() {
   const [selectedPort, setSelectedPort] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [triggerStatus, setTriggerStatus] = useState<ITriggerStatus>("LOFF");
-  const [historyData, setHistoryData] = useState<string[]>([]);
+  const [palletNo, setPalletNo] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [status, setStatus] = useState<IDataHistory["status"]>("idle");
 
   const initConnection = () => {
     return new SerialPort({
@@ -97,15 +101,21 @@ function App() {
 
       initConfigPort.on("readable", function () {
         const plainText = initConfigPort.read();
-        if (plainText && plainText.match(/./i)) {
-          // Limit data to only 6 entries and
-          // display the last two elements from array.
-          setHistoryData((prev) => {
-            const newData = [...prev, plainText];
-            const limitData = arrayLimit(6, newData);
 
-            return limitData;
-          });
+        if (plainText && !format.isEmpty(plainText)) {
+          const [, palletNo] = plainText.split(":");
+
+          if (format.isValidPalletNo(palletNo)) {
+            // TODO: call ASRS services
+            setStatus("success");
+            setErrorMsg("");
+          } else {
+            setErrorMsg("Invalid pallet number.");
+            setStatus("failed");
+          }
+          setPalletNo(palletNo);
+        } else {
+          console.log("Empty", plainText);
         }
       });
     } else {
@@ -126,10 +136,10 @@ function App() {
       />
       <Command
         isConnected={isConnected}
-        data={historyData}
         triggerStatus={triggerStatus}
         onTriggerStatus={onTriggerStatus}
       />
+      <DataHistory palletNo={palletNo} message={errorMsg} status={status} />
     </div>
   );
 }
