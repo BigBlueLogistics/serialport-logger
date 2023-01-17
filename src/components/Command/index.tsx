@@ -2,12 +2,7 @@ import DataHistory from "../DataHistory";
 import { ICommands } from "./types";
 import "./styles.scss";
 
-function Commands({
-  data,
-  triggerStatus,
-  isConnected,
-  onTriggerStatus,
-}: ICommands) {
+function Commands({ triggerStatus, isConnected, onTriggerStatus }: ICommands) {
   return (
     <fieldset id="fldt-command">
       <legend>Command</legend>
@@ -22,8 +17,6 @@ function Commands({
           {triggerStatus === "LOFF" ? "ON" : "OFF"}
         </button>
       </div>
-
-      <DataHistory data={data} />
     </fieldset>
   );
 }
