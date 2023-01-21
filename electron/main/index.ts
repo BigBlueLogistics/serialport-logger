@@ -1,6 +1,7 @@
-import { app, BrowserWindow, shell, ipcMain } from "electron";
+import { app, BrowserWindow, shell, ipcMain, Menu, MenuItem } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
+import MainWindowMenu from "../menu/main";
 
 // The built directory structure
 //
@@ -65,6 +66,23 @@ async function createWindow() {
     win.loadFile(indexHtml);
   }
 
+  // Menu for main window
+  const mainMenu = MainWindowMenu([
+    new MenuItem({
+      label: "Settings",
+      submenu: [
+        {
+          label: "Connection",
+          click: () => {
+            createChildWindow("/settings");
+          },
+        },
+      ],
+    }),
+  ]);
+
+  win.setMenu(mainMenu);
+
   // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
@@ -103,10 +121,12 @@ app.on("activate", () => {
 });
 
 // New window example arg: new windows url
-ipcMain.on("open-win", (_, json) => {
+function createChildWindow(route: string) {
   childWindow = new BrowserWindow({
     modal: true,
     parent: win,
+    width: 400,
+    height: 400,
 
     webPreferences: {
       preload,
@@ -116,11 +136,13 @@ ipcMain.on("open-win", (_, json) => {
   });
 
   if (process.env.VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${url}#${json.route}`);
+    childWindow.loadURL(`${url}#${route}`);
 
     childWindow.webContents.openDevTools();
   } else {
-    childWindow.loadFile(indexHtml, { hash: json.route });
+    childWindow.loadFile(indexHtml, { hash: route });
+
+    childWindow.removeMenu();
   }
 
   // set to null
@@ -130,7 +152,7 @@ ipcMain.on("open-win", (_, json) => {
   childWindow.on("closed", () => {
     childWindow = null;
   });
-});
+}
 
 // Global storage for serialport configurations.
 // And send data back to all open windows.
