@@ -48,7 +48,7 @@ class ASRSServices extends HttpAdapter {
 
       // ASRSPutawayNow
       const { data: dataPutawayNow } = await this.getASRSPutawayNow({
-        params: { ...queryParams, wrap: 0, square: 1 },
+        params: { ...queryParams, wrap: 1, square: 0 },
       });
       if (dataPutawayNow.status === "E") {
         throw dataPutawayNow.message;
