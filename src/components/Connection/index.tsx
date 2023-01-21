@@ -4,6 +4,7 @@ import { IPorts, IConnection } from "./types";
 import "./styles.scss";
 
 function Connection({
+  selectedPort,
   isConnected,
   onToggleConnection,
   onChangePortConfig,
@@ -35,7 +36,11 @@ function Connection({
       >
         {isConnected ? "disconnect" : "connect"}
       </button>
-      <select onChange={onChangePortConfig} disabled={isConnected}>
+      <select
+        onChange={onChangePortConfig}
+        disabled={isConnected}
+        value={selectedPort}
+      >
         <option value="">---</option>
         {optionPorts.length
           ? optionPorts.map((data) => (
