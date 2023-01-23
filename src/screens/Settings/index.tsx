@@ -12,6 +12,7 @@ function Settings() {
     const cacheMainStore = localStorage.getItem("serialport-config");
     if (cacheMainStore) {
       const parsedCacheStore = JSON.parse(cacheMainStore);
+
       setMainStore(parsedCacheStore);
     }
   }, []);

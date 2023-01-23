@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { ReadlineParser, SerialPort } from "serialport";
-import { ipcRenderer } from "electron";
-
 import DataHistory from "../../components/DataHistory";
 import { IDataHistory } from "../../components/DataHistory/types";
 import { ICommands } from "../../components/Command/types";
@@ -92,19 +90,24 @@ function Home() {
         const plainText = serialportConfig.read();
 
         if (plainText && !format.isEmpty(plainText)) {
-          const [, palletNo] = plainText.split(":");
+          console.log("plainTextzz", plainText.toString());
+          const [, palletNo] = plainText.toString().split(":");
 
+          //   if (palletNo && !format.isEmpty(palletNo)) {
           if (format.isValidPalletNo(palletNo)) {
             // TODO: call ASRS services
             setStatus("success");
-            setErrorMsg("");
+            setErrorMsg("OK");
           } else {
             setErrorMsg("Invalid pallet number.");
             setStatus("failed");
           }
           setPalletNo(palletNo);
-        } else {
-          console.log("Empty", plainText);
+          //   } else {
+          //     setStatus("idle");
+          //     setErrorMsg("");
+          //     setPalletNo("");
+          //   }
         }
       });
     } else {
@@ -115,8 +118,9 @@ function Home() {
   // rehydrate the main store from localStorage
   useEffect(() => {
     const cacheMainStore = localStorage.getItem("serialport-config");
-    if (cacheMainStore && serialportConfig) {
+    if (cacheMainStore) {
       const parsedCacheStore = JSON.parse(cacheMainStore);
+
       setMainStore(parsedCacheStore);
       ipcRendererSendMsg("set-store-value", parsedCacheStore);
     }
@@ -125,8 +129,6 @@ function Home() {
   // Listen new changes in mainStore from main process
   useEffect(() => {
     ipcRendererListenerMsg("get-store-value", (_, json) => {
-      console.log("Home store", json);
-
       setMainStore(json);
       localStorage.setItem("serialport-config", JSON.stringify(json));
     });
