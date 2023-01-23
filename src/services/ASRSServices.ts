@@ -1,20 +1,20 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { RawAxiosRequestConfig, AxiosResponse } from "axios";
 import HttpAdapter from "services/httpAdapter";
 import { IASRS } from "entities";
 
 class ASRSServices extends HttpAdapter {
   getASRSPutawayCheck(
-    config: AxiosRequestConfig
+    data: any
   ): Promise<AxiosResponse<IASRS & { LGPLA: string }>> {
-    return this.post("/ASRSPutawayCheck", {}, config);
+    return this.post("/ASRSPutawayCheck", data);
   }
 
-  getASRSPutawayNow(config: AxiosRequestConfig): Promise<AxiosResponse<IASRS>> {
-    return this.post("/ASRSPutawayNow", {}, config);
+  getASRSPutawayNow(data: any): Promise<AxiosResponse<IASRS>> {
+    return this.post("/ASRSPutawayNow", data);
   }
 
-  getASRSCheckWCS(config: AxiosRequestConfig): Promise<AxiosResponse<IASRS>> {
-    return this.post("/ASRSCheckWCS", {}, config);
+  getASRSCheckWCS(data: any): Promise<AxiosResponse<IASRS>> {
+    return this.post("/ASRSCheckWCS", data);
   }
 
   async transferPallet(palletNo: string) {
@@ -23,16 +23,15 @@ class ASRSServices extends HttpAdapter {
     try {
       // ASRSPutawayCheck
       const { data: dataPutawayCheck } = await this.getASRSPutawayCheck({
-        params: { lgnum: "WH05", ...queryParams },
+        ...queryParams,
+        lgnum: "WH05",
       });
       if (dataPutawayCheck.status === "E") {
         throw dataPutawayCheck.message;
       }
 
       // ASRSCheckWCS
-      const { data: dataWCS } = await this.getASRSCheckWCS({
-        params: queryParams,
-      });
+      const { data: dataWCS } = await this.getASRSCheckWCS(queryParams);
       if (dataWCS.status === "E") {
         throw dataWCS.message;
       }
@@ -48,7 +47,9 @@ class ASRSServices extends HttpAdapter {
 
       // ASRSPutawayNow
       const { data: dataPutawayNow } = await this.getASRSPutawayNow({
-        params: { ...queryParams, wrap: 1, square: 0 },
+        ...queryParams,
+        wrap: 1,
+        square: 0,
       });
       if (dataPutawayNow.status === "E") {
         throw dataPutawayNow.message;
