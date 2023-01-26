@@ -1,5 +1,5 @@
 {
-  "name": "serialport-logger",
+  "name": "bblc-serialport-logger",
   "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "A serial port data logger for SR-X300W barcode reader",
