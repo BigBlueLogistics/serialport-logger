@@ -6,8 +6,10 @@ import "./styles.scss";
 function Connection({
   selectedPort,
   isConnected,
+  conveyor,
   onToggleConnection,
   onChangePortConfig,
+  onChangeConveyor,
 }: IConnection) {
   const [optionPorts, setOptionPorts] = useState<IPorts>([]);
 
@@ -29,27 +31,38 @@ function Connection({
   return (
     <fieldset id="fldt-connection">
       <legend>Communication</legend>
-      <button
-        type="button"
-        onClick={onToggleConnection}
-        className="btn-connect"
-      >
-        {isConnected ? "disconnect" : "connect"}
-      </button>
-      <select
-        onChange={onChangePortConfig}
-        disabled={isConnected}
-        value={selectedPort}
-      >
-        <option value="">---</option>
-        {optionPorts.length
-          ? optionPorts.map((data) => (
-              <option key={data.path} value={data.path}>
-                {data.path}
-              </option>
-            ))
-          : null}
-      </select>
+      <div className="wrapper">
+        <label>Conveyor #: </label>
+        <input
+          type="text"
+          name="conveyor"
+          onChange={onChangeConveyor}
+          value={conveyor}
+        />
+      </div>
+      <div className="wrapper">
+        <button
+          type="button"
+          onClick={onToggleConnection}
+          className="btn-connect"
+        >
+          {isConnected ? "disconnect" : "connect"}
+        </button>
+        <select
+          onChange={onChangePortConfig}
+          disabled={isConnected}
+          value={selectedPort}
+        >
+          <option value="">---</option>
+          {optionPorts.length
+            ? optionPorts.map((data) => (
+                <option key={data.path} value={data.path}>
+                  {data.path}
+                </option>
+              ))
+            : null}
+        </select>
+      </div>
     </fieldset>
   );
 }

@@ -15,7 +15,12 @@ import "./styles.scss";
 let serialportConfig: SerialPort;
 
 function Home() {
-  const [mainStore, setMainStore] = useState<IMainStore | null>(null);
+  const [mainStore, setMainStore] = useState<IMainStore>({
+    connectionStatus: "DISCONNECTED",
+    port: "",
+    conveyor: "",
+    triggerStatus: "LOFF",
+  });
   const [palletNo, setPalletNo] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [status, setStatus] = useState<IDataHistory["status"]>("idle");
@@ -90,21 +95,29 @@ function Home() {
       if (plainText && !format.isEmpty(plainText)) {
         const palletNo = plainText.toString();
 
-        if (format.isValidPalletNo(palletNo)) {
-          try {
-            await aSRSServices.transferPallet(palletNo, conveyorDest);
-            resolve({ palletNo, message: "OK", status: "success" });
-          } catch (error: any) {
-            reject({
-              palletNo,
-              message: error.message,
-              status: "failed",
-            });
-          }
-        } else {
-          reject({
+        if (!format.isValidPalletNo(palletNo)) {
+          return reject({
             palletNo,
             message: "Invalid pallet number.",
+            status: "failed",
+          });
+        }
+
+        if (!conveyorDest) {
+          return reject({
+            palletNo,
+            message: "No conveyor set-up in settings.",
+            status: "failed",
+          });
+        }
+
+        try {
+          await aSRSServices.transferPallet(palletNo, conveyorDest);
+          resolve({ palletNo, message: "OK", status: "success" });
+        } catch (error: any) {
+          reject({
+            palletNo,
+            message: error.message,
             status: "failed",
           });
         }
@@ -118,11 +131,10 @@ function Home() {
       serialportConfig.pipe(parser);
       serialportConfig.setEncoding("utf8");
 
-      let i = 1;
       serialportConfig.on("readable", async function () {
         try {
           const { palletNo, message, status } = await transferPalletAsync(
-            "130101"
+            mainStore?.conveyor
           );
           setPalletNo(palletNo);
           setErrorMsg(message);

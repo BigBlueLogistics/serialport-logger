@@ -1,4 +1,4 @@
-export type IMainStore = Partial<{
+export type IMainStore = {
   port: string;
   connectionStatus:
     | "CONNECTING"
@@ -6,6 +6,7 @@ export type IMainStore = Partial<{
     | "DISCONNECTING"
     | "DISCONNECTED";
   triggerStatus: "LOFF" | "LON";
-}>;
+  conveyor: string;
+};
 
 export default IMainStore;

@@ -159,6 +159,7 @@ function createChildWindow(route: string) {
 let store = {
   connectionStatus: "DISCONNECTED",
   port: "",
+  conveyor: "",
   triggerStatus: "LOFF",
 };
 
