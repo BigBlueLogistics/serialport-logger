@@ -1,5 +1,5 @@
 import { RawAxiosRequestConfig } from "axios";
-import { axiosInit } from "config";
+import { axiosInit } from "../config";
 
 class HttpAdapter extends axiosInit {
   public get(url: string, config: RawAxiosRequestConfig = {}) {

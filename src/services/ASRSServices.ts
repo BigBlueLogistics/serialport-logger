@@ -1,6 +1,6 @@
 import { RawAxiosRequestConfig, AxiosResponse } from "axios";
-import HttpAdapter from "services/httpAdapter";
-import { IASRS } from "entities";
+import HttpAdapter from "./httpAdapter";
+import { IASRS } from "../entities";
 
 class ASRSServices extends HttpAdapter {
   getASRSPutawayCheck(
@@ -17,32 +17,47 @@ class ASRSServices extends HttpAdapter {
     return this.post("/ASRSCheckWCS", data);
   }
 
-  async transferPallet(palletNo: string) {
+  hasPalletFromOutbound(data: any) {
+    return this.get("/has-outbound", {
+      baseURL: "http://127.0.0.1:8000/api",
+      params: {
+        ...data,
+      },
+    });
+  }
+
+  async transferPallet(palletNo: string, conveyorDest: string) {
     const queryParams = { huident: palletNo, server: "prd" };
 
     try {
+      // Check has outbound
+      const { data: dataHasOutbound } = await this.hasPalletFromOutbound({
+        palletNo,
+        conveyor_des: conveyorDest,
+      });
+      if (dataHasOutbound.status === "E") {
+        throw new Error(dataHasOutbound.message);
+      }
+
       // ASRSPutawayCheck
       const { data: dataPutawayCheck } = await this.getASRSPutawayCheck({
         ...queryParams,
         lgnum: "WH05",
       });
       if (dataPutawayCheck.status === "E") {
-        throw dataPutawayCheck.message;
+        throw new Error(dataPutawayCheck.message);
       }
 
       // ASRSCheckWCS
       const { data: dataWCS } = await this.getASRSCheckWCS(queryParams);
       if (dataWCS.status === "E") {
-        throw dataWCS.message;
+        throw new Error(dataWCS.message);
       }
 
       // Bin2bin
-      const { data: dataBin2bin } = await this.bin2bin(
-        palletNo,
-        dataPutawayCheck.LGPLA
-      );
+      const { data: dataBin2bin } = await this.bin2bin(dataPutawayCheck.LGPLA);
       if (dataBin2bin.status === "E") {
-        throw dataBin2bin.message;
+        throw new Error(dataBin2bin.message);
       }
 
       // ASRSPutawayNow
@@ -52,18 +67,16 @@ class ASRSServices extends HttpAdapter {
         square: 0,
       });
       if (dataPutawayNow.status === "E") {
-        throw dataPutawayNow.message;
+        throw new Error(dataPutawayNow.message);
       }
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      throw new Error(error.message);
     }
   }
 
-  async bin2bin(
-    palletNo: string,
-    location: string
-  ): Promise<AxiosResponse<IASRS>> {
+  async bin2bin(location: string): Promise<AxiosResponse<IASRS>> {
     const wh = "WH05";
+    const palletNo = "";
     // const location = "ASRS";
 
     try {
@@ -242,12 +255,10 @@ class ASRSServices extends HttpAdapter {
 
       const resp = await this.post("/internalwebservice", {
         headerinfo: header,
-        palletid: palletNo,
         type: "bintobin",
         server: "prd",
         username: "RFCMANAGER",
         password: "2BBLC1234@dmin",
-        lgnum: "WH05",
       });
 
       return resp;

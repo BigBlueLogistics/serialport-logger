@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ReadlineParser, SerialPort } from "serialport";
 import DataHistory from "../../components/DataHistory";
+import { aSRSServices } from "../../services";
 import { IDataHistory } from "../../components/DataHistory/types";
 import { ICommands } from "../../components/Command/types";
 import {
@@ -80,34 +81,56 @@ function Home() {
     });
   };
 
+  const transferPalletAsync = (
+    conveyorDest: string
+  ): Promise<Record<string, any>> => {
+    return new Promise(async (resolve, reject) => {
+      const plainText = serialportConfig.read();
+
+      if (plainText && !format.isEmpty(plainText)) {
+        const palletNo = plainText.toString();
+
+        if (format.isValidPalletNo(palletNo)) {
+          try {
+            await aSRSServices.transferPallet(palletNo, conveyorDest);
+            resolve({ palletNo, message: "OK", status: "success" });
+          } catch (error: any) {
+            reject({
+              palletNo,
+              message: error.message,
+              status: "failed",
+            });
+          }
+        } else {
+          reject({
+            palletNo,
+            message: "Invalid pallet number.",
+            status: "failed",
+          });
+        }
+      }
+    });
+  };
+
   const readData = () => {
     if (serialportConfig) {
       const parser = new ReadlineParser();
       serialportConfig.pipe(parser);
       serialportConfig.setEncoding("utf8");
 
-      serialportConfig.on("readable", function () {
-        const plainText = serialportConfig.read();
-
-        if (plainText && !format.isEmpty(plainText)) {
-          console.log("plainTextzz", plainText.toString());
-          const [, palletNo] = plainText.toString().split(":");
-
-          //   if (palletNo && !format.isEmpty(palletNo)) {
-          if (format.isValidPalletNo(palletNo)) {
-            // TODO: call ASRS services
-            setStatus("success");
-            setErrorMsg("OK");
-          } else {
-            setErrorMsg("Invalid pallet number.");
-            setStatus("failed");
-          }
+      let i = 1;
+      serialportConfig.on("readable", async function () {
+        try {
+          const { palletNo, message, status } = await transferPalletAsync(
+            "130101"
+          );
           setPalletNo(palletNo);
-          //   } else {
-          //     setStatus("idle");
-          //     setErrorMsg("");
-          //     setPalletNo("");
-          //   }
+          setErrorMsg(message);
+          setStatus(status);
+        } catch (error: any) {
+          setPalletNo(error.palletNo);
+          setErrorMsg(error.message);
+          setStatus(error.status);
         }
       });
     } else {
