@@ -19,7 +19,7 @@ class ASRSServices extends HttpAdapter {
 
   hasPalletFromOutbound(data: any) {
     return this.get("/has-outbound", {
-      baseURL: "http://127.0.0.1:8000/api",
+      baseURL: "http://192.168.5.139:15692/api",
       params: {
         ...data,
       },
