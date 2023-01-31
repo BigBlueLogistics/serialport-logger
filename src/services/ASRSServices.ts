@@ -1,4 +1,4 @@
-import { RawAxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import HttpAdapter from "./httpAdapter";
 import { IASRS } from "../entities";
 
@@ -44,7 +44,11 @@ class ASRSServices extends HttpAdapter {
         ...queryParams,
         lgnum: "WH05",
       });
-      if (dataPutawayCheck.status === "E") {
+      const excludeMessage = `Pallet ${palletNo} is already located at ASRS, putaway request cannot be processed`;
+      if (
+        dataPutawayCheck.status === "E" &&
+        dataPutawayCheck.message.toLowerCase() !== excludeMessage.toLowerCase()
+      ) {
         throw new Error(dataPutawayCheck.message);
       }
 
@@ -55,14 +59,18 @@ class ASRSServices extends HttpAdapter {
       }
 
       // Bin2bin
-      const { data: dataBin2bin } = await this.bin2bin(dataPutawayCheck.LGPLA);
+      const { data: dataBin2bin } = await this.bin2bin(
+        palletNo,
+        dataPutawayCheck.LGPLA
+      );
       if (dataBin2bin.status === "E") {
         throw new Error(dataBin2bin.message);
       }
 
       // ASRSPutawayNow
       const { data: dataPutawayNow } = await this.getASRSPutawayNow({
-        ...queryParams,
+        server: "prd",
+        huident: palletNo,
         wrap: 1,
         square: 0,
       });
@@ -74,9 +82,12 @@ class ASRSServices extends HttpAdapter {
     }
   }
 
-  async bin2bin(location: string): Promise<AxiosResponse<IASRS>> {
+  async bin2bin(
+    palletNo: string,
+    location: string
+  ): Promise<AxiosResponse<IASRS>> {
     const wh = "WH05";
-    const palletNo = "";
+    // const palletNo = "";
     // const location = "ASRS";
 
     try {
