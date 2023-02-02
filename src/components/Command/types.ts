@@ -1,7 +1,6 @@
-export type ITriggerStatus = "LON" | "LOFF";
+import { IMainStore } from "../../entities";
 
 export type ICommands = {
   isConnected: boolean;
-  triggerStatus: ITriggerStatus;
   onTriggerStatus: () => void;
-};
+} & Pick<IMainStore, "triggerStatus">;

@@ -5,7 +5,7 @@ class AxiosInit {
 
   constructor() {
     const init = axios.create({
-      baseURL: "http://localhost:59629/api",
+      baseURL: "http://192.168.5.139:59629/api",
       headers: {
         Accept: "application/json",
       },

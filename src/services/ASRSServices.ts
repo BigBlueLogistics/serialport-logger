@@ -1,40 +1,61 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
-import HttpAdapter from "services/httpAdapter";
-import { IASRS } from "entities";
+import { AxiosResponse } from "axios";
+import HttpAdapter from "./httpAdapter";
+import { IASRS } from "../entities";
 
 class ASRSServices extends HttpAdapter {
   getASRSPutawayCheck(
-    config: AxiosRequestConfig
+    data: any
   ): Promise<AxiosResponse<IASRS & { LGPLA: string }>> {
-    return this.post("/ASRSPutawayCheck", {}, config);
+    return this.post("/ASRSPutawayCheck", data);
   }
 
-  getASRSPutawayNow(config: AxiosRequestConfig): Promise<AxiosResponse<IASRS>> {
-    return this.post("/ASRSPutawayNow", {}, config);
+  getASRSPutawayNow(data: any): Promise<AxiosResponse<IASRS>> {
+    return this.post("/ASRSPutawayNow", data);
   }
 
-  getASRSCheckWCS(config: AxiosRequestConfig): Promise<AxiosResponse<IASRS>> {
-    return this.post("/ASRSCheckWCS", {}, config);
+  getASRSCheckWCS(data: any): Promise<AxiosResponse<IASRS>> {
+    return this.post("/ASRSCheckWCS", data);
   }
 
-  async transferPallet(palletNo: string) {
+  hasPalletFromOutbound(data: any) {
+    return this.get("/has-outbound", {
+      baseURL: "http://192.168.5.139:15692/api",
+      params: {
+        ...data,
+      },
+    });
+  }
+
+  async transferPallet(palletNo: string, conveyorDest: string) {
     const queryParams = { huident: palletNo, server: "prd" };
 
     try {
+      // Check has outbound
+      const { data: dataHasOutbound } = await this.hasPalletFromOutbound({
+        palletNo,
+        conveyor_des: conveyorDest,
+      });
+      if (dataHasOutbound.status === "E") {
+        throw new Error(dataHasOutbound.message);
+      }
+
       // ASRSPutawayCheck
       const { data: dataPutawayCheck } = await this.getASRSPutawayCheck({
-        params: { lgnum: "WH05", ...queryParams },
+        ...queryParams,
+        lgnum: "WH05",
       });
-      if (dataPutawayCheck.status === "E") {
-        throw dataPutawayCheck.message;
+      const excludeMessage = `Pallet ${palletNo} is already located at ASRS, putaway request cannot be processed`;
+      if (
+        dataPutawayCheck.status === "E" &&
+        dataPutawayCheck.message.toLowerCase() !== excludeMessage.toLowerCase()
+      ) {
+        throw new Error(dataPutawayCheck.message);
       }
 
       // ASRSCheckWCS
-      const { data: dataWCS } = await this.getASRSCheckWCS({
-        params: queryParams,
-      });
+      const { data: dataWCS } = await this.getASRSCheckWCS(queryParams);
       if (dataWCS.status === "E") {
-        throw dataWCS.message;
+        throw new Error(dataWCS.message);
       }
 
       // Bin2bin
@@ -43,18 +64,21 @@ class ASRSServices extends HttpAdapter {
         dataPutawayCheck.LGPLA
       );
       if (dataBin2bin.status === "E") {
-        throw dataBin2bin.message;
+        throw new Error(dataBin2bin.message);
       }
 
       // ASRSPutawayNow
       const { data: dataPutawayNow } = await this.getASRSPutawayNow({
-        params: { ...queryParams, wrap: 0, square: 1 },
+        server: "prd",
+        huident: palletNo,
+        wrap: 1,
+        square: 0,
       });
       if (dataPutawayNow.status === "E") {
-        throw dataPutawayNow.message;
+        throw new Error(dataPutawayNow.message);
       }
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      throw new Error(error.message);
     }
   }
 
@@ -63,6 +87,7 @@ class ASRSServices extends HttpAdapter {
     location: string
   ): Promise<AxiosResponse<IASRS>> {
     const wh = "WH05";
+    // const palletNo = "";
     // const location = "ASRS";
 
     try {
@@ -241,12 +266,10 @@ class ASRSServices extends HttpAdapter {
 
       const resp = await this.post("/internalwebservice", {
         headerinfo: header,
-        palletid: palletNo,
         type: "bintobin",
         server: "prd",
         username: "RFCMANAGER",
         password: "2BBLC1234@dmin",
-        lgnum: "WH05",
       });
 
       return resp;

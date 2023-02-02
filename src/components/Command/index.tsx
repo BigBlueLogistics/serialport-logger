@@ -1,8 +1,7 @@
-import DataHistory from "../DataHistory";
 import { ICommands } from "./types";
 import "./styles.scss";
 
-function Commands({ triggerStatus, isConnected, onTriggerStatus }: ICommands) {
+function Commands({ isConnected, triggerStatus, onTriggerStatus }: ICommands) {
   return (
     <fieldset id="fldt-command">
       <legend>Command</legend>
