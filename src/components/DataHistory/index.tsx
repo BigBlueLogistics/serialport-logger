@@ -3,7 +3,6 @@ import "./styles.scss";
 
 function DataHistory({ palletNo, status, message }: IDataHistory) {
   const bgClass = status;
-  console.log("bgClass", status);
   return (
     <div className={`data-history ${bgClass}`}>
       {palletNo ? (

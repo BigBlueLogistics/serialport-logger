@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { ReadlineParser, SerialPort } from "serialport";
 import DataHistory from "../../components/DataHistory";
 import { aSRSServices } from "../../services";
@@ -9,12 +9,14 @@ import {
   ipcRendererSendMsg,
   ipcRendererListenerMsg,
 } from "../../utils";
+import { useIdle } from "../../hooks";
 import { IMainStore } from "entities";
 import "./styles.scss";
 
 let serialportConfig: SerialPort;
 
 function Home() {
+  const { startIdle, isIdle } = useIdle(1000 * 60); // 1 minute
   const [mainStore, setMainStore] = useState<IMainStore>({
     connectionStatus: "DISCONNECTED",
     port: "",
@@ -139,6 +141,8 @@ function Home() {
           setPalletNo(palletNo);
           setErrorMsg(message);
           setStatus(status);
+
+          startIdle();
         } catch (error: any) {
           setPalletNo(error.palletNo);
           setErrorMsg(error.message);
@@ -197,6 +201,15 @@ function Home() {
   useEffect(() => {
     readData();
   }, [serialportConfig]);
+
+  // If no barcode read after 1 minute it clears the data.
+  useEffect(() => {
+    if (isIdle) {
+      setPalletNo("");
+      setErrorMsg("");
+      setStatus("idle");
+    }
+  }, [isIdle]);
 
   return (
     <div className="container">
