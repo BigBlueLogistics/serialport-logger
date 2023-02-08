@@ -93,6 +93,20 @@ async function createWindow() {
     if (url.startsWith("https:")) shell.openExternal(url);
     return { action: "deny" };
   });
+
+  // Reset global config of connection status
+  win.on("close", () => {
+    win.webContents.executeJavaScript(`
+        const config = localStorage.getItem("serialport-config");
+         if(config){
+          let parsedConfig = JSON.parse(config);
+            parsedConfig.connectionStatus = "DISCONNECTED";
+            parsedConfig.triggerStatus = "LOFF";
+  
+            localStorage.setItem("serialport-config", JSON.stringify(parsedConfig));
+         }
+    `);
+  });
 }
 
 app.whenReady().then(createWindow);
