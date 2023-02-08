@@ -13,6 +13,7 @@ function Settings() {
     triggerStatus: "LOFF",
   });
 
+  // rehydrate the main store from localStorage
   useEffect(() => {
     const cacheMainStore = localStorage.getItem("serialport-config");
     if (cacheMainStore) {
