@@ -6,10 +6,12 @@ import "./styles.scss";
 function Connection({
   selectedPort,
   isConnected,
+  isSquare,
   conveyor,
   onToggleConnection,
   onChangePortConfig,
   onChangeConveyor,
+  onClickSquare,
 }: IConnection) {
   const [optionPorts, setOptionPorts] = useState<IPorts>([]);
 
@@ -32,13 +34,10 @@ function Connection({
     <fieldset id="fldt-connection">
       <legend>Communication</legend>
       <div className="wrapper">
-        <label>Conveyor #: </label>
-        <input
-          type="text"
-          name="conveyor"
-          onChange={onChangeConveyor}
-          value={conveyor}
-        />
+        <label>Squaring: </label>
+        <button type="button" className="btn-squaring" onClick={onClickSquare}>
+          {isSquare ? "DISABLE" : "ENABLE"}
+        </button>
       </div>
       <div className="wrapper">
         <button

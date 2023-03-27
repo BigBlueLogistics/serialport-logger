@@ -22,6 +22,7 @@ function Home() {
     port: "",
     conveyor: "",
     triggerStatus: "LOFF",
+    squaring: 0,
   });
   const [palletNo, setPalletNo] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -89,7 +90,8 @@ function Home() {
   };
 
   const transferPalletAsync = (
-    conveyorDest: string
+    conveyorDest: string,
+    square: 1 | 0
   ): Promise<Record<string, any>> => {
     return new Promise(async (resolve, reject) => {
       const plainText = serialportConfig.read();
@@ -114,7 +116,7 @@ function Home() {
         }
 
         try {
-          await aSRSServices.transferPallet(palletNo, conveyorDest);
+          await aSRSServices.transferPallet(palletNo, conveyorDest, square);
           resolve({ palletNo, message: "OK", status: "success" });
         } catch (error: any) {
           reject({
@@ -136,7 +138,8 @@ function Home() {
       serialportConfig.on("readable", async function () {
         try {
           const { palletNo, message, status } = await transferPalletAsync(
-            mainStore?.conveyor
+            mainStore?.conveyor,
+            mainStore?.squaring
           );
           setPalletNo(palletNo);
           setErrorMsg(message);

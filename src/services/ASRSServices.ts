@@ -26,7 +26,7 @@ class ASRSServices extends HttpAdapter {
     });
   }
 
-  async transferPallet(palletNo: string, conveyorDest: string) {
+  async transferPallet(palletNo: string, conveyorDest: string, square: 1 | 0) {
     const queryParams = { huident: palletNo, server: "prd" };
 
     try {
@@ -72,7 +72,7 @@ class ASRSServices extends HttpAdapter {
         server: "prd",
         huident: palletNo,
         wrap: 1,
-        square: 0,
+        square,
         overchk: 0,
       });
       if (dataPutawayNow.status === "E") {

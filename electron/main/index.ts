@@ -175,6 +175,7 @@ let store = {
   port: "",
   conveyor: "",
   triggerStatus: "LOFF",
+  squaring: 0,
 };
 
 ipcMain.on("set-store-value", (_, json) => {

@@ -7,6 +7,7 @@ export type IMainStore = {
     | "DISCONNECTED";
   triggerStatus: "LOFF" | "LON";
   conveyor: string;
+  squaring: 1 | 0;
 };
 
 export default IMainStore;
