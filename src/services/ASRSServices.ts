@@ -26,7 +26,7 @@ class ASRSServices extends HttpAdapter {
     });
   }
 
-  async transferPallet(palletNo: string, conveyorDest: string) {
+  async transferPallet(palletNo: string, conveyorDest: string, square: 1 | 0) {
     const queryParams = { huident: palletNo, server: "prd" };
 
     try {
@@ -43,6 +43,7 @@ class ASRSServices extends HttpAdapter {
       const { data: dataPutawayCheck } = await this.getASRSPutawayCheck({
         ...queryParams,
         lgnum: "WH05",
+        refcheck: "x",
       });
       const excludeMessage = `Pallet ${palletNo} is already located at ASRS, putaway request cannot be processed`;
       if (
@@ -72,7 +73,8 @@ class ASRSServices extends HttpAdapter {
         server: "prd",
         huident: palletNo,
         wrap: 1,
-        square: 0,
+        square,
+        overchk: 0,
       });
       if (dataPutawayNow.status === "E") {
         throw new Error(dataPutawayNow.message);

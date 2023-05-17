@@ -11,6 +11,7 @@ function Settings() {
     port: "",
     conveyor: "",
     triggerStatus: "LOFF",
+    squaring: 0,
   });
 
   // rehydrate the main store from localStorage
@@ -75,15 +76,22 @@ function Settings() {
     ipcRendererSendMsg("set-store-value", { conveyor: e.target.value });
   };
 
+  const onClickSquare = () => {
+    const squaring = Number(mainStore?.squaring) === 1 ? 0 : 1;
+    ipcRendererSendMsg("set-store-value", { squaring });
+  };
+
   return (
     <>
       <Connection
         selectedPort={mainStore?.port}
         conveyor={mainStore?.conveyor}
         isConnected={mainStore?.connectionStatus === "CONNECTED"}
+        isSquare={Number(mainStore?.squaring) === 1}
         onToggleConnection={onToggleConnection}
         onChangePortConfig={onChangePortConfig}
         onChangeConveyor={onChangeConveyor}
+        onClickSquare={onClickSquare}
       />
       <Command
         onTriggerStatus={onTriggerStatus}
