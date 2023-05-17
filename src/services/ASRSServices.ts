@@ -43,6 +43,7 @@ class ASRSServices extends HttpAdapter {
       const { data: dataPutawayCheck } = await this.getASRSPutawayCheck({
         ...queryParams,
         lgnum: "WH05",
+        refcheck: "x",
       });
       const excludeMessage = `Pallet ${palletNo} is already located at ASRS, putaway request cannot be processed`;
       if (
