@@ -1,7 +1,7 @@
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect } from "react";
 import { ReadlineParser, SerialPort } from "serialport";
 import DataHistory from "../../components/DataHistory";
-import { aSRSServices } from "../../services";
+import { aSRSServices, indicatorServices } from "../../services";
 import { IDataHistory } from "../../components/DataHistory/types";
 import { ICommands } from "../../components/Command/types";
 import {
@@ -20,9 +20,9 @@ function Home() {
   const [mainStore, setMainStore] = useState<IMainStore>({
     connectionStatus: "DISCONNECTED",
     port: "",
-    conveyor: "",
     triggerStatus: "LOFF",
     squaring: 0,
+    indicatorIp: "",
   });
   const [palletNo, setPalletNo] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -89,10 +89,7 @@ function Home() {
     });
   };
 
-  const transferPalletAsync = (
-    conveyorDest: string,
-    square: 1 | 0
-  ): Promise<Record<string, any>> => {
+  const transferPalletAsync = (square: 1 | 0): Promise<Record<string, any>> => {
     return new Promise(async (resolve, reject) => {
       const plainText = serialportConfig.read();
 
@@ -107,16 +104,9 @@ function Home() {
           });
         }
 
-        if (!conveyorDest) {
-          return reject({
-            palletNo,
-            message: "No conveyor set-up in settings.",
-            status: "failed",
-          });
-        }
-
         try {
-          await aSRSServices.transferPallet(palletNo, conveyorDest, square);
+          console.log("scanned pallet no.", palletNo);
+          await aSRSServices.transferPallet(palletNo, square);
           resolve({ palletNo, message: "OK", status: "success" });
         } catch (error: any) {
           reject({
@@ -138,7 +128,6 @@ function Home() {
       serialportConfig.on("readable", async function () {
         try {
           const { palletNo, message, status } = await transferPalletAsync(
-            mainStore?.conveyor,
             mainStore?.squaring
           );
           setPalletNo(palletNo);
@@ -146,10 +135,24 @@ function Home() {
           setStatus(status);
 
           startIdle();
+
+          // Turn on indicator lights
+          await indicatorServices.switchLights({
+            ipAddr: mainStore?.indicatorIp,
+            palletNo,
+            message,
+          });
         } catch (error: any) {
           setPalletNo(error.palletNo);
           setErrorMsg(error.message);
           setStatus(error.status);
+
+          // Turn on indicator lights
+          await indicatorServices.switchLights({
+            ipAddr: mainStore?.indicatorIp,
+            palletNo: error.palletNo,
+            message: error.message,
+          });
         }
       });
     } else {
