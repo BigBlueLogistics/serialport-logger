@@ -1,5 +1,4 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import Command from "../../components/Command";
 import { ipcRenderer } from "electron";
 import Connection from "../../components/Connection";
 import { ipcRendererSendMsg, ipcRendererListenerMsg } from "../../utils";
@@ -87,11 +86,8 @@ function Settings() {
         onChangePortConfig={onChangePortConfig}
         onClickSquare={onClickSquare}
         onChangeIndicatorIp={onChangeIndicatorIp}
-      />
-      <Command
         onTriggerStatus={onTriggerStatus}
         triggerStatus={mainStore?.triggerStatus}
-        isConnected={mainStore?.connectionStatus === "CONNECTED"}
       />
     </>
   );
