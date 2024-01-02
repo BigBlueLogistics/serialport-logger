@@ -8,6 +8,17 @@ class Format {
     const pattern = /./i;
     return !pattern.test(value);
   }
+
+  toLowerCase(value: string) {
+    if (!value) {
+      return "";
+    }
+
+    return value
+      .toLowerCase()
+      .trim()
+      .replaceAll(/[\r\n]/gm, "");
+  }
 }
 
 const format = new Format();

@@ -7,11 +7,11 @@ function Connection({
   selectedPort,
   isConnected,
   isSquare,
-  conveyor,
+  indicatorIp,
   onToggleConnection,
   onChangePortConfig,
-  onChangeConveyor,
   onClickSquare,
+  onChangeIndicatorIp,
 }: IConnection) {
   const [optionPorts, setOptionPorts] = useState<IPorts>([]);
 
@@ -61,6 +61,22 @@ function Connection({
               ))
             : null}
         </select>
+      </div>
+      <div className="wrapper">
+        <label>Indicators lights: </label>
+        <div>
+          <input
+            type="text"
+            value={indicatorIp}
+            size={15}
+            minLength={7}
+            maxLength={15}
+            pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$"
+            name="indicator-ip"
+            placeholder="E.g: 192.168.X.X"
+            onChange={onChangeIndicatorIp}
+          />
+        </div>
       </div>
     </fieldset>
   );

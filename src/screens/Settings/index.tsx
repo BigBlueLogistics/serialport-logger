@@ -9,9 +9,9 @@ function Settings() {
   const [mainStore, setMainStore] = useState<IMainStore>({
     connectionStatus: "DISCONNECTED",
     port: "",
-    conveyor: "",
     triggerStatus: "LOFF",
     squaring: 0,
+    indicatorIp: "",
   });
 
   // rehydrate the main store from localStorage
@@ -31,11 +31,6 @@ function Settings() {
   }, [ipcRenderer]);
 
   const onToggleConnection = () => {
-    if (!mainStore.conveyor) {
-      alert("Please input the conveyour number");
-      return;
-    }
-
     try {
       if (
         mainStore?.connectionStatus === "DISCONNECTED" ||
@@ -72,26 +67,26 @@ function Settings() {
     ipcRendererSendMsg("set-store-value", { triggerStatus: command });
   };
 
-  const onChangeConveyor = (e: ChangeEvent<HTMLInputElement>) => {
-    ipcRendererSendMsg("set-store-value", { conveyor: e.target.value });
-  };
-
   const onClickSquare = () => {
     const squaring = Number(mainStore?.squaring) === 1 ? 0 : 1;
     ipcRendererSendMsg("set-store-value", { squaring });
+  };
+
+  const onChangeIndicatorIp = (e: ChangeEvent<HTMLInputElement>) => {
+    ipcRendererSendMsg("set-store-value", { indicatorIp: e.target.value });
   };
 
   return (
     <>
       <Connection
         selectedPort={mainStore?.port}
-        conveyor={mainStore?.conveyor}
+        indicatorIp={mainStore?.indicatorIp}
         isConnected={mainStore?.connectionStatus === "CONNECTED"}
         isSquare={Number(mainStore?.squaring) === 1}
         onToggleConnection={onToggleConnection}
         onChangePortConfig={onChangePortConfig}
-        onChangeConveyor={onChangeConveyor}
         onClickSquare={onClickSquare}
+        onChangeIndicatorIp={onChangeIndicatorIp}
       />
       <Command
         onTriggerStatus={onTriggerStatus}

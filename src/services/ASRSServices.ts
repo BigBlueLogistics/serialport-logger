@@ -26,14 +26,13 @@ class ASRSServices extends HttpAdapter {
     });
   }
 
-  async transferPallet(palletNo: string, conveyorDest: string, square: 1 | 0) {
+  async transferPallet(palletNo: string, square: 1 | 0) {
     const queryParams = { huident: palletNo, server: "prd" };
 
     try {
       // Check has outbound
       const { data: dataHasOutbound } = await this.hasPalletFromOutbound({
         palletNo,
-        conveyor_des: conveyorDest,
       });
       if (dataHasOutbound.status === "E") {
         throw new Error(dataHasOutbound.message);

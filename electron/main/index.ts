@@ -63,6 +63,7 @@ async function createWindow() {
     // Open devTool if the app is not packaged
     win.webContents.openDevTools();
   } else {
+    win.webContents.openDevTools();
     win.loadFile(indexHtml);
   }
 
@@ -173,9 +174,9 @@ function createChildWindow(route: string) {
 let store = {
   connectionStatus: "DISCONNECTED",
   port: "",
-  conveyor: "",
   triggerStatus: "LOFF",
   squaring: 0,
+  indicatorIp: "",
 };
 
 ipcMain.on("set-store-value", (_, json) => {

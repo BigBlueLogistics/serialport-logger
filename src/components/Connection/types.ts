@@ -5,11 +5,11 @@ export type IConnection = {
   selectedPort: string | undefined;
   isConnected: boolean;
   isSquare: boolean;
-  conveyor: string;
-  onChangeConveyor: (e: ChangeEvent<HTMLInputElement>) => void;
+  indicatorIp: string;
   onToggleConnection: () => SerialPort | unknown;
   onChangePortConfig: (e: ChangeEvent<HTMLSelectElement>) => void;
   onClickSquare: () => void;
+  onChangeIndicatorIp: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
 export type IPorts = {
