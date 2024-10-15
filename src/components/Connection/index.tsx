@@ -79,7 +79,7 @@ function Connection({
           {triggerStatus === "LOFF" ? "ON" : "OFF"}
         </button>
       </div>
-      <div className="form-control">
+      {/* <div className="form-control">
         <label>Squaring: </label>
         <button
           type="button"
@@ -88,7 +88,7 @@ function Connection({
         >
           {isSquare ? "DISABLE" : "ENABLE"}
         </button>
-      </div>
+      </div> */}
       <div className="form-control">
         <label>
           Indicator lights: <small>IP address</small>

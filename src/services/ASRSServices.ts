@@ -72,7 +72,7 @@ class ASRSServices extends HttpAdapter {
         server: "prd",
         huident: palletNo,
         wrap: 1,
-        square,
+        square: 0,
         overchk: 0,
       });
       if (dataPutawayNow.status === "E") {
