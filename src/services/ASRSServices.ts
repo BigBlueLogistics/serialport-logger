@@ -58,15 +58,6 @@ class ASRSServices extends HttpAdapter {
         throw new Error(dataWCS.message);
       }
 
-      // Bin2bin
-      const { data: dataBin2bin } = await this.bin2bin(
-        palletNo,
-        dataPutawayCheck.LGPLA
-      );
-      if (dataBin2bin.status === "E") {
-        throw new Error(dataBin2bin.message);
-      }
-
       // ASRSPutawayNow
       const { data: dataPutawayNow } = await this.getASRSPutawayNow({
         server: "prd",
@@ -77,6 +68,15 @@ class ASRSServices extends HttpAdapter {
       });
       if (dataPutawayNow.status === "E") {
         throw new Error(dataPutawayNow.message);
+      }
+
+      // Bin2bin
+      const { data: dataBin2bin } = await this.bin2bin(
+        palletNo,
+        dataPutawayCheck.LGPLA
+      );
+      if (dataBin2bin.status === "E") {
+        throw new Error(dataBin2bin.message);
       }
     } catch (error: any) {
       throw new Error(error.message);
